@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-
+import './index.scss'
 
 class Game extends Component {
+  timeout = 0;
   constructor(props) {
     super(props);
     this.state = {
@@ -42,12 +43,13 @@ class Game extends Component {
       numbers[j] = numbers[i];
       numbers[i] = temp;
     }
-    this.setState({numbers, rules})
+    this.setState({numbers, rules});
 
     this.startTimer();
   }
 
   componentWillUnmount() {
+    clearInterval(this.timeout);
     this.setState({numbers: []})
   }
 
@@ -56,7 +58,9 @@ class Game extends Component {
     const {timeRange} = this.props;
     let timer = timeRange;
 
-    setInterval(() => {
+    clearInterval(this.timeout);
+
+    this.timeout = setInterval(() => {
       if (timer === 0) {
         timer = timeRange;
         this.props.followTime(timer);
@@ -85,14 +89,14 @@ class Game extends Component {
     this.setState({currentRoundOpenedCardsIndex});
 
     if (comparison.length === 0) {
-      rules.map((rule, i) => {
+      rules.forEach((rule, i) => {
         if (rule.indexOf(currentNum) !== -1 && currentRoundOpenedCards.indexOf(currentNum) === -1) {
           comparison.push(i);
           currentRoundOpenedCards.push(currentNum)
         }
       })
     } else {
-      comparison.map(line => {
+      comparison.forEach(line => {
         matched.push(rules[line].indexOf(currentNum) !== -1)
       });
 
@@ -111,14 +115,17 @@ class Game extends Component {
       this.props.setPoints()
     } else if (currentRoundOpenedCards.length < 2 && comparison.length === 0) {
       setTimeout(() => {
+        this.startTimer();
         this.props.nextRound()
       }, 1000)
     }
 
     if (currentRoundOpenedCardsIndex.length === 3) {
       this.setOpenedCards();
+      currentRoundOpenedCardsIndex = [];
       currentRoundOpenedCards = [];
-      comparison = []
+      comparison = [];
+      this.startTimer();
     }
 
     setTimeout(() => {
@@ -131,13 +138,18 @@ class Game extends Component {
   };
 
   setOpenedCards = () => {
-    let {openedCardsIndex, currentRoundOpenedCardsIndex} = this.state;
+    let {openedCardsIndex, currentRoundOpenedCardsIndex, numbers} = this.state;
     openedCardsIndex = openedCardsIndex.concat(currentRoundOpenedCardsIndex);
     this.setState({
       currentRoundOpenedCardsIndex: [],
       openedCardsIndex,
     });
-    this.props.nextRound();
+
+    if (openedCardsIndex.length === numbers.length) {
+      this.props.endGame();
+    } else {
+      this.props.nextRound();
+    }
 
   }
 

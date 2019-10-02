@@ -1,0 +1,28 @@
+@import '../../assets/variables.scss';
+
+.players {
+  background-color: $themeColor;
+  font-weight: bold;
+  flex: 0 0 25%;
+  padding-top: 30px;
+  box-shadow: inset -3px 0px 8px 0px #636f73;
+  .player {
+    width: 250px;
+    max-width: 90%;
+    background-color: $baseColor;
+    padding: 20px;
+    margin: 20px auto;
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+    &.current {
+      transform: scale(1.08, 1.2);
+      box-shadow: 0px 1px 9px 4px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+    }
+    @media (max-width: 650px) {
+      display: inline-block;
+      width: 42%;
+    }
+  }
+  @media (max-width: 650px) {
+    padding-top: 15px;
+  }
+}

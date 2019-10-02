@@ -1,8 +1,11 @@
 import React, {Component} from 'react';
-import Game from "./Game";
-import Settings from "./Settings";
-import Player from "./Player";
-import Timer from "./Timer";
+import Game from "../Game/index";
+import Settings from "../Settings/index";
+import Player from "../Player/index";
+import Timer from "../Timer/index";
+import PopUp from "../PopUp/index";
+import Congrats from "../Congrats/index";
+import './index.scss'
 
 
 class Dashboard extends Component {
@@ -14,23 +17,28 @@ class Dashboard extends Component {
       difficulty: 1,
       isShowSettings: false,
       isGameStarted: false,
+      isGameFinished: false,
       timer: 0,
       currentPlayer: 0,
+      winner: null,
+      maxScore: null
     };
   }
 
   componentDidMount() {
 
-  }
+    const search = window.location.search
+    let hashes = search.slice(search.indexOf('?') + 1).split('&');
 
-  componentWillUnmount() {
-
+    hashes.forEach((hash) => {
+      let [name, val] = hash.split('=');
+      this.handleChangeSettings(name, val);
+    });
   }
 
   handleChangeSettings = (name, val) => {
     if (name === 'players') {
-      let p = new Array(+val).fill({score: 0});
-      console.log(p);
+      let p = new Array(+val).fill(0);
       this.setState({players: p})
     } else {
       this.setState({
@@ -44,8 +52,11 @@ class Dashboard extends Component {
 
   };
 
-  closeSettings = () => {
-    this.setState({isShowSettings: false})
+  closePopUp = () => {
+    this.setState({
+      isShowSettings: false,
+      isGameFinished: false
+    })
 
   };
 
@@ -99,8 +110,21 @@ class Dashboard extends Component {
     })
   };
 
+  endGame = () => {
+    const {players} = this.state;
+    const maxScore = Math.max(...players);
+    const winner = players.indexOf(maxScore) + 1;
+
+    this.setState({
+      winner,
+      maxScore,
+      isGameFinished: true,
+      isGameStarted: false,
+    })
+  }
+
   render() {
-    const {isGameStarted, isShowSettings, players, timeRange, timer, difficulty, currentPlayer} = this.state;
+    const {isGameStarted, isGameFinished, isShowSettings, players, timeRange, timer, difficulty, currentPlayer, winner, maxScore} = this.state;
     return (
       <div className="dashboard">
         {isGameStarted
@@ -114,6 +138,9 @@ class Dashboard extends Component {
         <div className="game-box">
           <div>
             <h1>Math Memory Game.</h1>
+            {!isGameStarted && !isShowSettings &&
+            <button className="start-game-btn btn-primary" onClick={this.openSettings}>Start</button>}
+
             {isGameStarted
             && <Game
               players={players}
@@ -123,20 +150,27 @@ class Dashboard extends Component {
               nextRound={this.nextRound}
               followTime={this.followTime}
               setPoints={this.setPoints}
+              endGame={this.endGame}
             />
             }
           </div>
         </div>
-        {isShowSettings && <Settings
-          players={players.length}
-          timeRange={timeRange}
-          difficulty={difficulty}
-          handleChangeSettings={this.handleChangeSettings}
-          closeSettings={this.closeSettings}
-          handleStart={this.handleStart}
-        />}
-        {!isGameStarted && !isShowSettings &&
-        <button className="start-game-btn btn-primary" onClick={this.openSettings}>Start</button>}
+        {(isShowSettings || isGameFinished)
+        && <PopUp
+            closePopUp={this.closePopUp}
+          >
+          {isShowSettings && <Settings
+            players={players.length}
+            timeRange={timeRange}
+            difficulty={difficulty}
+            handleChangeSettings={this.handleChangeSettings}
+            handleStart={this.handleStart}
+          />}
+          {isGameFinished && <Congrats winner={winner} maxScore={maxScore}/>}
+        </PopUp>
+        }
+
+
       </div>
     );
   }

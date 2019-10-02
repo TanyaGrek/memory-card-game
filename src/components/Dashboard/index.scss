@@ -1,0 +1,28 @@
+@import '../../assets/variables.scss';
+
+.dashboard {
+  background-color: $baseColor;
+  color: $textColor;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  font-size: calc(10px + 2vmin);
+  @media (max-width: 650px) {
+    flex-direction: column-reverse;
+    h1 {
+      font-size: 1.5em;
+    }
+  }
+}
+
+.start-game-btn {
+  width: 200px;
+  height: 200px;
+  border: none;
+  border-radius: 50%;
+  background-color: $themeColor;
+  color: $baseColor;
+  font-size: 30px;
+  cursor: pointer;
+}

@@ -1,0 +1,9 @@
+@import '../../assets/variables.scss';
+
+.timer {
+  color: $baseColor;
+  margin-bottom: 50px;
+  @media (max-width: 650px) {
+    margin-bottom: 0;
+  }
+}

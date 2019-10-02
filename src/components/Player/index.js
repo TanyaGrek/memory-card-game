@@ -1,7 +1,7 @@
 import React from 'react';
+import './index.scss'
 
 function Player(props) {
-  //console.log(props);
   const {player, playerNum, currentPlayer} = props;
   return (
     <div className={currentPlayer + 1 === playerNum ? "player current" : "player"}>
